@@ -73,11 +73,26 @@ You may also need to change the default <code>model</code> inside <code>llm_clie
 </p>
 
 <h2 id="quickstart">4) Quick Start</h2>
-<details>
-  <summary><strong>Verify the LLM client is set up</strong></summary>
-  <pre><code>python -c "from llm_client import complete_text; print(complete_text('Reply with exactly: OK'))"</code></pre>
-  <p>You should see <code>OK</code>.</p>
-</details>
+<ol>
+  <li><strong>Clone & enter</strong><br>
+    <code>git clone &lt;this-repo-url&gt; &amp;&amp; cd LLM_assisted_proof_generation</code>
+  </li>
+  <li><strong>Install deps</strong><br>
+    <code>pip install openai python-dotenv</code>
+  </li>
+  <li><strong>Create <code>.env</code></strong> with your OpenRouter key (see section 3).</li>
+  <li><strong>Choose a model</strong> in <code>llm_client.py</code> that your account can use.</li>
+  <li><strong>Connectivity sanity check</strong><br>
+    <code>python -c "from llm_client import complete_text; print(complete_text('Reply with exactly: OK'))"</code><br>
+    You should see <code>OK</code>.
+  </li>
+  <li><strong>Run benchmarks</strong> (also writes <code>bench_results.txt</code>):<br>
+    <code>python benchmarks.py</code>
+  </li>
+  <li><strong>Try the verifier CLI</strong> with your own proof file (see section 6):<br>
+    <code>python CLI.py -A "P,P-&gt;Q" -G "Q" -P my_proof.txt</code>
+  </li>
+</ol>
 
 <h2 id="orchestrator">5) Run the Orchestrator (Part II)</h2>
 <h3>A) Programmatic</h3>
