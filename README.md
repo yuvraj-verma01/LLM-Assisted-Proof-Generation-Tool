@@ -159,7 +159,7 @@ generate_proof([], "(~A -> B) -> (~A -> ~A)")
 </details>
 <details>
   <summary><strong>Imports fail</strong></summary>
-  <p>Run from the project root (<code>/LLM-Assisted-Proof-Generation-Tool
+  <p>Run from the project root (<code>LLM-Assisted-Proof-Generation-Tool/
 </code>).</p>
 </details>
 
