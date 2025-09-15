@@ -159,7 +159,8 @@ generate_proof([], "(~A -> B) -> (~A -> ~A)")
 </details>
 <details>
   <summary><strong>Imports fail</strong></summary>
-  <p>Run from the project root (<code>LLM_assisted_proof_generation/</code>).</p>
+  <p>Run from the project root (<code>/LLM-Assisted-Proof-Generation-Tool
+</code>).</p>
 </details>
 
 <h2 id="aiuse">11) Important: Use of AI in Development</h2>
