@@ -7,7 +7,7 @@
   <p style="margin:8px 0 0 0;">
     <img alt="Python" src="https://img.shields.io/badge/Python-3.10%2B-informational">
     <img alt="LLM" src="https://img.shields.io/badge/LLM-OpenRouter-blueviolet">
-    <img alt="License" src="https://img.shields.io/badge/Logic-P2%20Hilbert%20style-lightgrey">
+    <img alt="License" src="https://img.shields.io/badge/Logic-P2%20style-lightgrey">
   </p>
 </div>
 
