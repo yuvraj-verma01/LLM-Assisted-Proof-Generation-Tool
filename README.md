@@ -30,7 +30,7 @@
   <li><a href="#orchestrator">Run the Orchestrator (Part II)</a></li>
   <li><a href="#verifier">Run the Verifier Only (Part I)</a></li>
   <li><a href="#io">Input/Output Conventions</a></li>
-  <li><a href="#axioms">P2 Axioms (Schema) & Rule</a></li>
+  <li><a href="#axioms">P2 Axioms & MP Rule</a></li>
   <li><a href="#examples">Examples</a></li>
   <li><a href="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#aiuse">Use of AI in Development</a></li>
