@@ -75,7 +75,7 @@ You may also need to change the default <code>model</code> inside <code>llm_clie
 <h2 id="quickstart">4) Quick Start</h2>
 <ol>
   <li><strong>Clone & enter</strong><br>
-    <code>git clone &lt;this-repo-url&gt; &amp;&amp; cd LLM_assisted_proof_generation</code>
+    <code>git clone &lt;this-repo-url&gt; &amp;&amp; cd LLM-Assisted-Proof-Generation-Tool</code>
   </li>
   <li><strong>Install deps</strong><br>
     <code>pip install openai python-dotenv</code>
