@@ -24,7 +24,7 @@ def run_case(premises, goal, desc, attempts: int):
 
 # (premises, goal, description)
 BENCHMARKS = [
-    ([],"P -> (Q -> P)", "1")
+    ([],"P -> (Q -> P)", "1"),
     (["P", "P -> Q"], "Q", "2"),
     (["~Q -> ~P", "P"], "Q", "3"),
     (["P -> Q", "Q -> R"], "P -> R", "4"),

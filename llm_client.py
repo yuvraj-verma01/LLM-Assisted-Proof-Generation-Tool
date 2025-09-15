@@ -1,31 +1,35 @@
+# llm_client.py
 import os
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
-load_dotenv()
+load_dotenv()  
 
-API_KEY = os.environ.get("OPENROUTER_API_KEY")
-if not API_KEY:
-    raise RuntimeError("OPENROUTER_API_KEY not set. Put it in a .env file or environment variable.")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
+if not API_KEY or not API_KEY.startswith("sk-or-"):
+    raise RuntimeError("Missing or wrong OPENROUTER_API_KEY (should start with 'sk-or-').")
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=API_KEY,
 )
 
-def complete_text(prompt: str, model: str = "deepseek/deepseek-r1:free") -> str:
-    """
-    Send a prompt to the OpenRouter LLM and return the response text.
-    Default model: deepseek/deepseek-r1:free
-    """
-    completion = client.chat.completions.create(
-        extra_headers={
-            "HTTP-Referer": "http://localhost",   
-            "X-Title": "Proof Checker",           
-        },
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=800,
-    )
-    return completion.choices[0].message.content.strip()
+DEFAULT_MODEL = "deepseek/deepseek-r1-0528-qwen3-8b:free"  
+
+def complete_text(prompt: str, model: str = DEFAULT_MODEL) -> str:
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.2,
+            max_tokens=800,
+            extra_headers={
+                
+                "HTTP-Referer": "http://localhost",
+                "X-Title": "Proof Generator",
+            },
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception as e:
+
+        raise RuntimeError(f"LLM call failed: {e}") from e
