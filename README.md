@@ -13,7 +13,6 @@
 
 <hr/>
 
-<!-- Quick Intro -->
 <p>
   This project has two parts:
 </p>
@@ -22,7 +21,6 @@
   <li><strong>Part II (Orchestrator):</strong> Uses an LLM to generate/repair a proof for given premises and a goal. If no proof is found, it produces a counterexample (truth assignment).</li>
 </ul>
 
-<!-- TOC -->
 <h2 id="toc">Table of Contents</h2>
 <ol>
   <li><a href="#requirements">Requirements</a></li>
@@ -40,20 +38,14 @@
 
 <hr/>
 
-<!-- 0) Requirements -->
 <h2 id="requirements">0) Requirements</h2>
 <ul>
   <li>Python <strong>3.10+</strong></li>
-  <li>
-    Optional deps:
-    <code>openai</code> (OpenRouter-compatible), <code>python-dotenv</code>
-    <br/>Install (if you have a requirements file):
-    <pre><code>pip install -r requirements.txt</code></pre>
-  </li>
+  <li>No <code>requirements.txt</code> provided. You must install dependencies manually:</li>
 </ul>
+<pre><code>pip install openai python-dotenv</code></pre>
 
-<!-- 1) Layout -->
-<h2 id="layout">1) Project Layout (what you actually run)</h2>
+<h2 id="layout">1) Project Layout</h2>
 <pre><code>LLM_assisted_proof_generation/
   axioms.py               # AX1–AX3 patterns (schema)
   p2_ast.py               # AST node types
@@ -61,26 +53,25 @@
   parser.py               # parser
   matcher.py              # axiom instance matcher
   substitution.py         # variable substitution
-  proofline.py            # proof line parser ("&lt;n&gt;. &lt;formula&gt;  &lt;rule&gt;")
+  proofline.py            # proof line parser ("<n>. <formula>  <rule>")
   proof_checker.py        # Part I checker
-  llm_client.py           # OpenRouter client (loads key from .env)
+  llm_client.py           # OpenRouter client (reads key from .env, model configurable inside)
   orchestrator.py         # Part II generate→verify→repair (+ counterexample)
   semantics.py            # truth-table evaluator/counterexample
-  CLI.py                  # optional CLI for Part I only (verifier)
-  benchmarks.py           # runs a suite of cases through the orchestrator
-  test_orchestrator.py    # quick examples for success/failure
-  .env                    # put your API key here (see below)
+  CLI.py                  # CLI for Part I only (verifier)
+  benchmarks.py           # runs a suite of cases, outputs to bench_results.txt
+  README.md
+  .env (not committed)    # you must create this with your API key
 </code></pre>
 
-<!-- 2) API Key -->
 <h2 id="apikey">2) API Key (OpenRouter)</h2>
-<p>
-  We call the LLM via OpenRouter. Put your key in a local <code>.env</code> file at the project root:
-</p>
-<pre><code>OPENROUTER_API_KEY= not_stated_here
+<p>Create a file named <code>.env</code> in the project root:</p>
+<pre><code>OPENROUTER_API_KEY=your_api_key_here
 </code></pre>
+<p>
+You may also need to change the default <code>model</code> inside <code>llm_client.py</code> to a model available under your account.
+</p>
 
-<!-- 3) Quick Start -->
 <h2 id="quickstart">3) Quick Start</h2>
 <details>
   <summary><strong>Verify the LLM client is set up</strong></summary>
@@ -88,12 +79,11 @@
   <p>You should see <code>OK</code>.</p>
 </details>
 
-<!-- 4) Orchestrator -->
 <h2 id="orchestrator">4) Run the Orchestrator (Part II)</h2>
-<h3>A) Programmatic (simple)</h3>
+<h3>A) Programmatic</h3>
 <pre><code>from orchestrator import generate_proof
 
-premises = ["P", "P -&gt; Q"]
+premises = ["P", "P -> Q"]
 goal = "Q"
 
 ok, proof, errors = generate_proof(premises, goal)
@@ -101,119 +91,85 @@ print("SUCCESS" if ok else "FAILED")
 print(proof if ok else errors)
 </code></pre>
 
-<h3>B) Pre-baked examples</h3>
+<h3>B) Benchmarks</h3>
 <pre><code>python benchmarks.py
 </code></pre>
-<p>This runs a few success/failure cases and prints either a valid proof or a counterexample.</p>
+<p>This runs a few success/failure cases and saves output to <code>bench_results.txt</code>.</p>
 
-<!-- 5) Verifier -->
 <h2 id="verifier">5) Run the Verifier Only (Part I)</h2>
-<p>
-  You can use the verifier by itself (no LLM). The expected proof file format is:
-</p>
-<pre><code>&lt;n&gt;. &lt;formula&gt;  &lt;justification&gt;
-
-Two spaces before the justification
-justification ∈ {Premise, AX1, AX2, AX3, MP i,j, Substitution k &lt;mapping&gt;}
-
-Example:
-1. P              Premise
-2. P -&gt; Q         Premise
+<p>Proofs must be written in a plain text file (e.g. <code>my_proof.txt</code>):</p>
+<pre><code>1. P              Premise
+2. P -> Q         Premise
 3. Q              MP 1,2
 </code></pre>
 
-<p>With the provided <code>CLI.py</code>:</p>
-<pre><code># Example (Windows PowerShell / macOS / Linux)
-python CLI.py -A "P,P-&gt;Q" -G "Q"  # if CLI prints nothing, it just verified silently
+<p>Run via CLI:</p>
+<pre><code># Example
+python CLI.py -A "P,P->Q" -G "Q" -P my_proof.txt
 </code></pre>
+<ul>
+  <li><code>-A</code> / <code>--assumptions</code>: comma-separated premises (leave empty if none)</li>
+  <li><code>-G</code> / <code>--goal</code>: the goal formula</li>
+  <li><code>-P</code> / <code>--proof</code>: path to the proof text file</li>
+</ul>
+<p>If the proof verifies, it prints <code>Proof verified.</code>. Otherwise, errors are listed:contentReference[oaicite:0]{index=0}.</p>
 
-<p>
-  The orchestrator handles proof generation; the CLI is only for manual verification of a file you’ve already written.
-</p>
-
-<!-- 6) I/O Conventions -->
 <h2 id="io">6) Input/Output Conventions</h2>
 <ul>
-  <li><strong>Premises / Goal (strings)</strong><br/>
-    ASCII only: <code>~</code>, <code>-&gt;</code>, parentheses.<br/>
-    Variables: letters, digits, underscores (start with a letter), e.g. <code>P</code>, <code>Q1</code>, <code>rate_ok</code>.
-  </li>
-  <li><strong>Proof text (LLM output or manual)</strong><br/>
-    Each line: <code>"&lt;n&gt;. &lt;formula&gt; &lt;justification&gt;"</code><br/>
-    Line numbers start at 1 and are consecutive.<br/>
-    Allowed rules: <code>Premise, AX1, AX2, AX3, MP i,j</code> (<em>Substitution</em> is supported by the verifier but the orchestrator prompt avoids it.)
-  </li>
-  <li><strong>Counterexamples</strong><br/>
-    Printed as a Python dict, e.g. <code>{'P': False, 'Q': False}</code><br/>
-    Means: premises are true and goal is false under that assignment.
-  </li>
+  <li><strong>ASCII only</strong>: <code>~</code>, <code>-></code>, parentheses.</li>
+  <li>Variables: letters, digits, underscores (must start with a letter).</li>
+  <li>Justifications: <code>Premise</code>, <code>AX1</code>, <code>AX2</code>, <code>AX3</code>, <code>MP i,j</code>. (Substitution supported but not used in orchestrator.)</li>
+  <li>Counterexamples are printed as dicts, e.g. <code>{'P': True, 'Q': False}</code>.</li>
 </ul>
 
-<!-- 7) Axioms -->
-<h2 id="axioms">7) Axioms (Schema)</h2>
+<h2 id="axioms">7) Axioms</h2>
 <ul>
-  <li><strong>AX1</strong>: <code>A -&gt; (B -&gt; A)</code></li>
-  <li><strong>AX2</strong>: <code>(A -&gt; (B -&gt; C)) -&gt; ((A -&gt; B) -&gt; (A -&gt; C))</code></li>
-  <li><strong>AX3</strong>: <code>(~B -&gt; ~A) -&gt; (A -&gt; B)</code></li>
+  <li><strong>AX1</strong>: <code>A -> (B -> A)</code></li>
+  <li><strong>AX2</strong>: <code>(A -> (B -> C)) -> ((A -> B) -> (A -> C))</code></li>
+  <li><strong>AX3</strong>: <code>(~B -> ~A) -> (A -> B)</code></li>
 </ul>
-<p><strong>Rule: Modus Ponens (MP)</strong><br/>
-From <code>φ</code> and <code>φ -&gt; ψ</code>, infer <code>ψ</code>.
-</p>
+<p><strong>Rule:</strong> Modus Ponens (MP): from <code>φ</code> and <code>φ -> ψ</code>, infer <code>ψ</code>.</p>
 
-<!-- 8) Examples -->
-<h2 id="examples">8) Examples you can try</h2>
+<h2 id="examples">8) Examples</h2>
 <h3>Provable</h3>
-<pre><code>generate_proof(["P", "P -&gt; Q"], "Q")
-generate_proof([], "P -&gt; (Q -&gt; P)")
-generate_proof(["~Q -&gt; ~P", "P"], "Q")
-generate_proof(["P -&gt; Q", "Q -&gt; R"], "P -&gt; R")
+<pre><code>generate_proof(["P", "P -> Q"], "Q")
+generate_proof([], "P -> (Q -> P)")
+generate_proof(["~Q -> ~P", "P"], "Q")
+generate_proof(["P -> Q", "Q -> R"], "P -> R")
 </code></pre>
 
-<h3>Unprovable (gets counterexample)</h3>
-<pre><code>generate_proof(["P -&gt; Q"], "P")
+<h3>Unprovable (counterexample)</h3>
+<pre><code>generate_proof(["P -> Q"], "P")
 generate_proof([], "P")
-generate_proof([], "(~A -&gt; B) -&gt; (~A -&gt; ~A)")
+generate_proof([], "(~A -> B) -> (~A -> ~A)")
 </code></pre>
 
-<!-- 9) Troubleshooting -->
 <h2 id="troubleshooting">9) Troubleshooting</h2>
-
 <details>
   <summary><strong>OPENROUTER_API_KEY not set</strong></summary>
-  <p>Create <code>.env</code> with <code>OPENROUTER_API_KEY=...</code> or set the env var in your shell.</p>
+  <p>Create a <code>.env</code> with <code>OPENROUTER_API_KEY=...</code>.</p>
 </details>
-
 <details>
-  <summary><strong>No output when running orchestrator.py</strong></summary>
-  <p>It only defines functions by default. Use <code>test_orchestrator.py</code>/<code>benchmarks.py</code>, or add a small <code>if __name__ == "__main__":</code> to run a case.</p>
+  <summary><strong>No output from orchestrator.py</strong></summary>
+  <p>Use <code>benchmarks.py</code> or add <code>if __name__ == "__main__":</code> in <code>orchestrator.py</code>.</p>
 </details>
-
 <details>
-  <summary><strong>Unicode operators (like ¬, →)</strong></summary>
-  <p>The orchestrator normalizes them to ASCII. If you’re writing proofs by hand, use <code>~</code> and <code>-&gt;</code>.</p>
+  <summary><strong>Unicode operators</strong></summary>
+  <p>Use ASCII only: <code>~</code> and <code>-></code>.</p>
 </details>
-
 <details>
   <summary><strong>Imports fail</strong></summary>
-  <p>Run from the project root (<code>LLM_assisted_proof_generation/</code>). All files are in one folder, so <code>from X import Y</code> should work.</p>
+  <p>Run from the project root (<code>LLM_assisted_proof_generation/</code>).</p>
 </details>
 
-<!-- 10) AI Use -->
 <h2 id="aiuse">10) Important: Use of AI in Development</h2>
 <p>
-  This project was built with the assistance of AI tools (ChatGPT).
-  AI was used to:
+This project was built with the assistance of AI tools (ChatGPT).  
+AI was used to generate code templates, integrate the LLM client, devise benchmarks, draft docs, and test cases.  
+All AI-generated outputs were reviewed and understood by the author.
 </p>
-<ol>
-  <li>Generate example code templates (semantics, matcher, proof_checker, proofline, orchestrator).</li>
-  <li>Understand LLM integration.</li>
-  <li>Devise benchmark cases.</li>
-  <li>Draft documentation and test cases.</li>
-  <li>All AI-generated code and text were reviewed, tested, and understood by the author.</li>
-</ol>
 
 <hr/>
-
 <p align="center" style="font-size:13px;color:#666;">
-  <em>ASCII operators only:</em> Negation: <code>~</code> &nbsp;•&nbsp; Implication: <code>-&gt;</code> &nbsp;•&nbsp; Parentheses: <code>( )</code>
+  <em>ASCII operators only:</em> Negation: <code>~</code> • Implication: <code>-></code> • Parentheses: <code>( )</code>
 </p>
