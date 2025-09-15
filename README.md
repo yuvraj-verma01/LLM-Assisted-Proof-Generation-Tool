@@ -30,7 +30,7 @@
   <li><a href="#orchestrator">Run the Orchestrator (Part II)</a></li>
   <li><a href="#verifier">Run the Verifier Only (Part I)</a></li>
   <li><a href="#io">Input/Output Conventions</a></li>
-  <li><a href="#axioms">Axioms (Schema) & Rule</a></li>
+  <li><a href="#axioms">P2 Axioms (Schema) & Rule</a></li>
   <li><a href="#examples">Examples</a></li>
   <li><a href="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#aiuse">Use of AI in Development</a></li>
@@ -38,14 +38,14 @@
 
 <hr/>
 
-<h2 id="requirements">0) Requirements</h2>
+<h2 id="requirements">1) Requirements</h2>
 <ul>
   <li>Python <strong>3.10+</strong></li>
   <li>No <code>requirements.txt</code> provided. You must install dependencies manually:</li>
 </ul>
 <pre><code>pip install openai python-dotenv</code></pre>
 
-<h2 id="layout">1) Project Layout</h2>
+<h2 id="layout">2) Project Layout</h2>
 <pre><code>LLM_assisted_proof_generation/
   axioms.py               # AX1–AX3 patterns (schema)
   p2_ast.py               # AST node types
@@ -64,7 +64,7 @@
   .env (not committed)    # you must create this with your API key
 </code></pre>
 
-<h2 id="apikey">2) API Key (OpenRouter)</h2>
+<h2 id="apikey">3) API Key (OpenRouter)</h2>
 <p>Create a file named <code>.env</code> in the project root:</p>
 <pre><code>OPENROUTER_API_KEY=your_api_key_here
 </code></pre>
@@ -72,14 +72,14 @@
 You may also need to change the default <code>model</code> inside <code>llm_client.py</code> to a model available under your account.
 </p>
 
-<h2 id="quickstart">3) Quick Start</h2>
+<h2 id="quickstart">4) Quick Start</h2>
 <details>
   <summary><strong>Verify the LLM client is set up</strong></summary>
   <pre><code>python -c "from llm_client import complete_text; print(complete_text('Reply with exactly: OK'))"</code></pre>
   <p>You should see <code>OK</code>.</p>
 </details>
 
-<h2 id="orchestrator">4) Run the Orchestrator (Part II)</h2>
+<h2 id="orchestrator">5) Run the Orchestrator (Part II)</h2>
 <h3>A) Programmatic</h3>
 <pre><code>from orchestrator import generate_proof
 
@@ -96,7 +96,7 @@ print(proof if ok else errors)
 </code></pre>
 <p>This runs a few success/failure cases and saves output to <code>bench_results.txt</code>.</p>
 
-<h2 id="verifier">5) Run the Verifier Only (Part I)</h2>
+<h2 id="verifier">6) Run the Verifier Only (Part I)</h2>
 <p>Proofs must be written in a plain text file (e.g. <code>my_proof.txt</code>):</p>
 <pre><code>1. P              Premise
 2. P -> Q         Premise
@@ -114,7 +114,7 @@ python CLI.py -A "P,P->Q" -G "Q" -P my_proof.txt
 </ul>
 <p>If the proof verifies, it prints <code>Proof verified.</code>. Otherwise, errors are listed:contentReference[oaicite:0]{index=0}.</p>
 
-<h2 id="io">6) Input/Output Conventions</h2>
+<h2 id="io">7) Input/Output Conventions</h2>
 <ul>
   <li><strong>ASCII only</strong>: <code>~</code>, <code>-></code>, parentheses.</li>
   <li>Variables: letters, digits, underscores (must start with a letter).</li>
@@ -122,7 +122,7 @@ python CLI.py -A "P,P->Q" -G "Q" -P my_proof.txt
   <li>Counterexamples are printed as dicts, e.g. <code>{'P': True, 'Q': False}</code>.</li>
 </ul>
 
-<h2 id="axioms">7) Axioms</h2>
+<h2 id="axioms">8) P2 Axioms</h2>
 <ul>
   <li><strong>AX1</strong>: <code>A -> (B -> A)</code></li>
   <li><strong>AX2</strong>: <code>(A -> (B -> C)) -> ((A -> B) -> (A -> C))</code></li>
@@ -130,7 +130,7 @@ python CLI.py -A "P,P->Q" -G "Q" -P my_proof.txt
 </ul>
 <p><strong>Rule:</strong> Modus Ponens (MP): from <code>φ</code> and <code>φ -> ψ</code>, infer <code>ψ</code>.</p>
 
-<h2 id="examples">8) Examples</h2>
+<h2 id="examples">9) Examples</h2>
 <h3>Provable</h3>
 <pre><code>generate_proof(["P", "P -> Q"], "Q")
 generate_proof([], "P -> (Q -> P)")
@@ -144,7 +144,7 @@ generate_proof([], "P")
 generate_proof([], "(~A -> B) -> (~A -> ~A)")
 </code></pre>
 
-<h2 id="troubleshooting">9) Troubleshooting</h2>
+<h2 id="troubleshooting">10) Troubleshooting</h2>
 <details>
   <summary><strong>OPENROUTER_API_KEY not set</strong></summary>
   <p>Create a <code>.env</code> with <code>OPENROUTER_API_KEY=...</code>.</p>
@@ -162,7 +162,7 @@ generate_proof([], "(~A -> B) -> (~A -> ~A)")
   <p>Run from the project root (<code>LLM_assisted_proof_generation/</code>).</p>
 </details>
 
-<h2 id="aiuse">10) Important: Use of AI in Development</h2>
+<h2 id="aiuse">11) Important: Use of AI in Development</h2>
 <p>
 This project was built with the assistance of AI tools (ChatGPT).  
 AI was used to generate code templates, integrate the LLM client, devise benchmarks, draft docs, and test cases.  
